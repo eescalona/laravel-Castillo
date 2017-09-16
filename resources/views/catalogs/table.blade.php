@@ -9,7 +9,7 @@
     @foreach($catalogs as $catalog)
         <tr>
             <td>{!! $catalog->title !!}</td>
-            <td>{!! $catalog->image !!}</td>
+            <td>{!! $catalog->image->title !!}</td>
             <td>{!! $catalog->url !!}</td>
             <td>
                 {!! Form::open(['route' => ['catalogs.destroy', $catalog->id], 'method' => 'delete']) !!}

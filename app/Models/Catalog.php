@@ -29,7 +29,7 @@ class Catalog extends Model
 
     public $fillable = [
         'title',
-        'image',
+        'image_id',
         'url'
     ];
 
@@ -41,7 +41,7 @@ class Catalog extends Model
     protected $casts = [
         'id' => 'integer',
         'title' => 'string',
-        'image' => 'integer',
+        'image_id' => 'integer',
         'url' => 'string'
     ];
 
@@ -54,5 +54,12 @@ class Catalog extends Model
         
     ];
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     **/
+    public function image()
+    {
+        return $this->belongsTo(\App\Models\File::class);
+    }
     
 }

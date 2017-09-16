@@ -63,6 +63,13 @@ class ProjectAPIController extends AppBaseController
         return $this->sendResponse($projects->toArray(), 'Projects retrieved successfully');
     }
 
+    public function gallery(Request $request, $project_id){
+                return $this->sendResponse(
+                    Project::findOrFail($project_id)->files,
+                    'Projects retrieved successfully');
+
+    }
+
     public function test(Request $request, string $input, integer $id = null){
         return $this->sendResponse($input.$id, 'Projects retrieved successfully');
 
@@ -100,7 +107,14 @@ class ProjectAPIController extends AppBaseController
 
         if (empty($project)) {
             return $this->sendError('Project not found');
+        }else{
+            if(isset($project->image)){
+                $project->image_url = $project->image->url;
+            }else{
+                $project->image_url = '';
+            }
         }
+
 
         return $this->sendResponse($project->toArray(), 'Project retrieved successfully');
     }

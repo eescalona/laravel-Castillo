@@ -38,7 +38,17 @@ class CatalogAPIController extends AppBaseController
     {
         $this->catalogRepository->pushCriteria(new RequestCriteria($request));
         $this->catalogRepository->pushCriteria(new LimitOffsetCriteria($request));
+
         $catalogs = $this->catalogRepository->all();
+
+        $catalogs->transform(function ($catalog, $key) {
+            if(isset($catalog->image)){
+                $catalog->image_url = $catalog->image->url;
+            }else{
+                $catalog->image_url = '';
+            }
+            return $catalog;
+        });
 
         return $this->sendResponse($catalogs->toArray(), 'Catalogs retrieved successfully');
     }

@@ -21,7 +21,7 @@ class CatalogRepository extends BaseRepository
      */
     protected $fieldSearchable = [
         'title',
-        'image',
+        'image_id',
         'url'
     ];
 

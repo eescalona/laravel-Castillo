@@ -6,8 +6,8 @@
 
 <!-- Image Field -->
 <div class="form-group col-sm-6">
-    {!! Form::label('image', 'Image:') !!}
-    {!! Form::number('image', null, ['class' => 'form-control']) !!}
+    {!! Form::label('image_id', 'Image:') !!}
+    {!! Form::number('image_id', null, ['class' => 'form-control']) !!}
 </div>
 
 <!-- Url Field -->

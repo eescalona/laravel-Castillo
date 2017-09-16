@@ -50,7 +50,7 @@ class File extends Model
      **/
     public function project()
     {
-        return $this->belongsTo(\App\Models\Projects::class);
+        return $this->belongsTo(\App\Models\Project::class);
     }
 
 }
