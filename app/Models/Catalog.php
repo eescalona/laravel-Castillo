@@ -2,24 +2,34 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use Eloquent as Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
-class File extends Model
-
+/**
+ * Class Catalog
+ * @package App\Models
+ * @version September 16, 2017, 4:32 pm UTC
+ *
+ * @property string title
+ * @property integer image
+ * @property string url
+ */
+class Catalog extends Model
 {
-    public $table = 'files';
+    use SoftDeletes;
 
+    public $table = 'catalogs';
+    
     const CREATED_AT = 'created_at';
     const UPDATED_AT = 'updated_at';
 
 
-    protected $dates = [];
+    protected $dates = ['deleted_at'];
 
 
     public $fillable = [
-        'project_id',
         'title',
-        'slug',
+        'image',
         'url'
     ];
 
@@ -30,10 +40,9 @@ class File extends Model
      */
     protected $casts = [
         'id' => 'integer',
-        'project_id' => 'integer',
         'title' => 'string',
-        'slug' => 'string',
-        'url' => 'string',
+        'image' => 'integer',
+        'url' => 'string'
     ];
 
     /**
@@ -42,15 +51,8 @@ class File extends Model
      * @var array
      */
     public static $rules = [
-
+        
     ];
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     **/
-    public function project()
-    {
-        return $this->belongsTo(\App\Models\Projects::class);
-    }
-
+    
 }

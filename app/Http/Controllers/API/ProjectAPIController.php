@@ -4,11 +4,13 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Requests\API\CreateProjectAPIRequest;
 use App\Http\Requests\API\UpdateProjectAPIRequest;
+use App\Models\Category;
 use App\Models\Project;
 use App\Repositories\ProjectRepository;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
 use InfyOm\Generator\Criteria\LimitOffsetCriteria;
+use PhpParser\Node\Name;
 use Prettus\Repository\Criteria\RequestCriteria;
 use Response;
 
@@ -34,11 +36,29 @@ class ProjectAPIController extends AppBaseController
      * @param Request $request
      * @return Response
      */
-    public function index(Request $request)
+    public function index(Request $request,$category_id = NULL)
     {
         $this->projectRepository->pushCriteria(new RequestCriteria($request));
         $this->projectRepository->pushCriteria(new LimitOffsetCriteria($request));
-        $projects = $this->projectRepository->all();
+
+        if($category_id == NULL){
+            $projects = $this->projectRepository->All();
+        } else{
+            $category = Category::whereSlug($category_id)->first();
+            if(is_null($category)){
+                return $this->sendResponse(NULL, 'Category not found');
+            }
+            $projects = Project::whereCategoryId($category->id)->get();
+
+            $projects->transform(function ($proyect, $key) {
+                if(isset($proyect->image)){
+                    $proyect->image_url = $proyect->image->url;
+                }else{
+                    $proyect->image_url = '';
+                }
+                return $proyect;
+            });
+        }
 
         return $this->sendResponse($projects->toArray(), 'Projects retrieved successfully');
     }

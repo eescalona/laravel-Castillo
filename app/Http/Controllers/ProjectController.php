@@ -29,6 +29,7 @@ class ProjectController extends AppBaseController
      */
     public function index(Request $request)
     {
+        //return "mi test";
         $this->projectRepository->pushCriteria(new RequestCriteria($request));
         $projects = $this->projectRepository->paginate(25);
 

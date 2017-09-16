@@ -20,6 +20,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string price
  * @property string description
  * @property string address
+ * @property integer 'image'
  */
 class Project extends Model
 {
@@ -41,7 +42,8 @@ class Project extends Model
         'style_id',
         'price',
         'description',
-        'address'
+        'address',
+        'image'
     ];
 
     /**
@@ -57,7 +59,8 @@ class Project extends Model
         'style_id' => 'integer',
         'price' => 'string',
         'description' => 'string',
-        'address' => 'string'
+        'address' => 'string',
+        'image' => 'integer'
     ];
 
     /**
@@ -80,9 +83,9 @@ class Project extends Model
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      **/
-    public function style()
+    public function image()
     {
-        return $this->belongsTo(\App\Models\Style::class);
+        return $this->hasOne(\App\Models\File::class);
     }
 
     /**

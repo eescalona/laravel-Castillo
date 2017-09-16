@@ -19,5 +19,10 @@ Route::get('/', function () {
 Auth::routes();
 
 Route::get('/home', 'HomeController@index');
+Route::get('/test', 'HomeController@dropzoneStore');
+Route::get('dropzone', 'HomeController@dropzone');
+Route::post('dropzone/store', ['as'=>'dropzone.store','uses'=>'HomeController@dropzoneStore']);
 
 Route::resource('projects', 'ProjectController');
+
+Route::resource('catalogs', 'CatalogController');
