@@ -1,5 +1,5 @@
 RewriteEngine on
-RewriteCond %{HTTP_HOST} ^cocinascastillo.escalonasoftware.com$ [NC,OR]
-RewriteCond %{HTTP_HOST} ^www.cocinascastillo.escalonasoftware.com$
+RewriteCond %{HTTP_HOST} ^cocinascastillodev.escalonasoftware.com$ [NC,OR]
+RewriteCond %{HTTP_HOST} ^www.cocinascastillodev.escalonasoftware.com$
 RewriteCond %{REQUEST_URI} !/public/
 RewriteRule (.*) /public/$1 [L]

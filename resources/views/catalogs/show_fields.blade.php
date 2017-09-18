@@ -13,7 +13,7 @@
 <!-- Image Field -->
 <div class="form-group">
     {!! Form::label('image', 'Image:') !!}
-    <p>{!! $catalog->image !!}</p>
+    <p>{!! $catalog->image->title !!}</p>
 </div>
 
 <!-- Url Field -->

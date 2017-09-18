@@ -26,3 +26,6 @@ Route::post('dropzone/store', ['as'=>'dropzone.store','uses'=>'HomeController@dr
 Route::resource('projects', 'ProjectController');
 
 Route::resource('catalogs', 'CatalogController');
+
+
+Route::get('/test/catalog', '_test@catalog');

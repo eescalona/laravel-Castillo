@@ -48,20 +48,36 @@ class ProjectAPIController extends AppBaseController
             if(is_null($category)){
                 return $this->sendResponse(NULL, 'Category not found');
             }
-            $projects = Project::whereCategoryId($category->id)->get();
+            $projects = Project::whereCategoryId($category->id)->orderBy('id', 'DESC')->get();
 
-            $projects->transform(function ($proyect, $key) {
-                if(isset($proyect->image)){
-                    $proyect->image_url = $proyect->image->url;
+            $projects->transform(function ($project, $key) {
+                if(isset($project->image)){
+                    $project->image_url = $project->image->url;
                 }else{
-                    $proyect->image_url = '';
+                    $project->image_url = '';
                 }
-                return $proyect;
+                return $project;
+            });
+
+            $projects->transform(function ($project, $key) {
+                $project->next_id = $project->id-1;
+                $project->prev_id = $project->id+1;
+
+                //No siguiente  devolver 0.   Recordar orderBy DESC
+                return $project;
             });
         }
 
         return $this->sendResponse($projects->toArray(), 'Projects retrieved successfully');
     }
+
+    public function gallery(Request $request, $project_id){
+                return $this->sendResponse(
+                    Project::findOrFail($project_id)->files,
+                    'Projects retrieved successfully');
+
+    }
+
 
     public function test(Request $request, string $input, integer $id = null){
         return $this->sendResponse($input.$id, 'Projects retrieved successfully');
@@ -100,7 +116,14 @@ class ProjectAPIController extends AppBaseController
 
         if (empty($project)) {
             return $this->sendError('Project not found');
+        }else{
+            if(isset($project->image)){
+                $project->image_url = $project->image->url;
+            }else{
+                $project->image_url = '';
+            }
         }
+
 
         return $this->sendResponse($project->toArray(), 'Project retrieved successfully');
     }
