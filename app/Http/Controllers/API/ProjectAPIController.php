@@ -56,14 +56,9 @@ class ProjectAPIController extends AppBaseController
                 }else{
                     $project->image_url = '';
                 }
-                return $project;
-            });
-
-            $projects->transform(function ($project, $key) {
                 $project->next_id = $project->id-1;
                 $project->prev_id = $project->id+1;
 
-                //No siguiente  devolver 0.   Recordar orderBy DESC
                 return $project;
             });
         }
