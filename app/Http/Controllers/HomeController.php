@@ -22,6 +22,16 @@ class HomeController extends Controller
     {
         return view('home');
     }
+
+    /**
+     * Show register view
+     *
+     * @return void
+     */
+    public function register(){
+        return view('auth.register');
+    }
+
     /**
      * Generate Image upload View
      *
@@ -30,24 +40,5 @@ class HomeController extends Controller
     public function dropzone()
     {
         return view('dropzone');
-    }
-
-    /**
-     * Image Upload Code
-     *
-     * @return void
-     */
-    public function dropzoneStore(Request $request)
-    {
-
-
-        $image = $request->file('file');
-        $imageName = time().$image->getClientOriginalName();
-        $image->move(public_path('images'),$imageName);
-
-
-
-
-        return response()->json(['success'=>$imageName]);
     }
 }

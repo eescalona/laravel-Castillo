@@ -59,7 +59,7 @@ class Catalog extends Model
      **/
     public function image()
     {
-        return $this->belongsTo(\App\Models\File::class);
+        return $this->hasOne(\App\Models\File::class,'id','image_id');
     }
     
 }

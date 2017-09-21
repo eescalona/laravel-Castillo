@@ -4,15 +4,19 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\CreateCatalogRequest;
 use App\Http\Requests\UpdateCatalogRequest;
+use App\Models\File;
 use App\Repositories\CatalogRepository;
-use App\Http\Controllers\AppBaseController;
 use Illuminate\Http\Request;
 use Flash;
 use Prettus\Repository\Criteria\RequestCriteria;
 use Response;
+use URL;
+use \Cviebrock\EloquentSluggable\Services\SlugService;
+use Html;
 
 class CatalogController extends AppBaseController
 {
+    const PROJECTS_IMAGES = '/public/images/Catalogs/';
     /** @var  CatalogRepository */
     private $catalogRepository;
 
@@ -55,8 +59,25 @@ class CatalogController extends AppBaseController
      */
     public function store(CreateCatalogRequest $request)
     {
+        // TODO try - catch con transaccion de base de datos
         $input = $request->all();
 
+        if($request->hasFile('image')){
+            $file = $request->file('image');
+            $name = pathinfo( $file->getClientOriginalName(), PATHINFO_FILENAME);
+            $extension = pathinfo( $file->getClientOriginalName(), PATHINFO_EXTENSION);
+            $slug = SlugService::createSlug(File::class, 'slug', $name);
+            $url = self::PROJECTS_IMAGES;
+
+            $new_file = new File();
+            $new_file->title  = $request->get('title');
+            $new_file->name  = $name;
+            $new_file->url = URL::to($url.$slug.'.'.$extension);
+
+            $request->file('image')->move(base_path().$url,$slug.'.'.$extension);
+            $new_file->save();
+            $input['image_id'] = $new_file->id;
+        }
         $catalog = $this->catalogRepository->create($input);
 
         Flash::success('Catalog saved successfully.');

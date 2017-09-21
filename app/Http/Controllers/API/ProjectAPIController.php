@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Requests\API\CreateProjectAPIRequest;
 use App\Http\Requests\API\UpdateProjectAPIRequest;
 use App\Models\Category;
+use App\Models\File;
 use App\Models\Project;
 use App\Repositories\ProjectRepository;
 use Illuminate\Http\Request;
@@ -56,8 +57,19 @@ class ProjectAPIController extends AppBaseController
                 }else{
                     $project->image_url = '';
                 }
-                $project->next_id = $project->id-1;
-                $project->prev_id = $project->id+1;
+                $list=Project::whereCategoryId($project->category_id)->orderBy('id', 'DESC')->get();
+                $maxItem=$list->count()-2;
+                if($key>$maxItem){
+                    $project->next_id = 0;
+                }else{
+                    $project->next_id = $list[$key+1]->id;
+                }
+
+                if($key==0){
+                    $project->prev_id = 0;
+                }else{
+                    $project->prev_id = $list[$key-1]->id;
+                }
 
                 return $project;
             });
@@ -67,9 +79,12 @@ class ProjectAPIController extends AppBaseController
     }
 
     public function gallery(Request $request, $project_id){
-                return $this->sendResponse(
-                    Project::findOrFail($project_id)->files,
-                    'Projects retrieved successfully');
+        $principal_image = Project::whereId($project_id)->first()->image;
+        $all_files = File::whereProjectId($project_id)
+            ->where('id', '<>',$principal_image->id)
+            ->get();
+        $all_files->prepend($principal_image);
+        return $this->sendResponse($all_files, 'Gallery retrieved successfully');
 
     }
 

@@ -37,12 +37,11 @@
 <body class="hold-transition register-page">
 <div class="register-box">
     <div class="register-logo">
-        <a href="{{ url('/home') }}"><b>InfyOm </b>Generator</a>
+        <img src="{{asset('public/images/assets/logo.png')}}" style="max-height: 100px">
     </div>
 
     <div class="register-box-body">
         <p class="login-box-msg">Sign Up</p>
-
         <form method="post" action="{{ url('/register') }}">
 
             {!! csrf_field() !!}
@@ -92,22 +91,19 @@
             </div>
 
             <div class="row">
-                <div class="col-xs-8">
-                    <div class="checkbox icheck">
-                        <label>
-                            <input type="checkbox"> I agree to the <a href="#">terms</a>
-                        </label>
+                <div class="col-xs-6">
+                    <a href="/" class="text-center">
+                        <button type="button" class="btn btn-default btn-block btn-flat">Go to Home</button>
+                    </a>
                     </div>
-                </div>
                 <!-- /.col -->
-                <div class="col-xs-4">
+                <div class="col-xs-6">
                     <button type="submit" class="btn btn-primary btn-block btn-flat">Register</button>
                 </div>
                 <!-- /.col -->
             </div>
         </form>
 
-        <a href="{{ url('/login') }}" class="text-center">I already have a membership</a>
     </div>
     <!-- /.form-box -->
 </div>

@@ -10,22 +10,28 @@
     {!! $project->title !!}
 </div>
 
+<!-- Description Field -->
+<div class="form-group">
+    {!! Form::label('description', 'Description:') !!}
+    {!! $project->description !!}
+</div>
+
 <!-- Year Field -->
 <div class="form-group">
     {!! Form::label('year', 'Year:') !!}
     {!! $project->year !!}
 </div>
 
-<!-- Category Id Field -->
+<!-- Category Field -->
 <div class="form-group">
-    {!! Form::label('category_id', 'Category Id:') !!}
+    {!! Form::label('category_id', 'Category:') !!}
     {!! $project->category->title !!}
 </div>
 
-<!-- Style Id Field -->
+<!-- Style Field -->
 <div class="form-group">
-    {!! Form::label('style_id', 'Style Id:') !!}
-    {!! $project->style->title !!}
+    {!! Form::label('style', 'Style:') !!}
+    {!! $project->style !!}
 </div>
 
 <!-- Price Field -->
@@ -34,15 +40,15 @@
     {!! $project->price !!}
 </div>
 
-<!-- Description Field -->
-<div class="form-group">
-    {!! Form::label('description', 'Description:') !!}
-    {!! $project->description !!}
-</div>
-
 <!-- Address Field -->
 <div class="form-group">
     {!! Form::label('address', 'Address:') !!}
     {!! $project->address !!}
 </div>
 
+<!-- Image Field -->
+<div class="form-group">
+    {!! Form::label('image', 'Imagen principal:') !!}
+    {!! $project->image->url !!}<br>
+    {!! Form::image($project->image->url) !!}
+</div>

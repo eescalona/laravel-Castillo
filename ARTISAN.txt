@@ -1,0 +1,5 @@
+php artisan infyom:scaffold MyFile --fromTable --tableName=files --paginate=25
+php artisan infyom:api_scaffold Post --relations
+
+(desarrollo + local )
+php artisan vendor:publish --provider="Cviebrock\EloquentSluggable\ServiceProvider"

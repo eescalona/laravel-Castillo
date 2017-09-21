@@ -173,6 +173,8 @@ return [
         \InfyOm\Generator\InfyOmGeneratorServiceProvider::class,
         \InfyOm\AdminLTETemplates\AdminLTETemplatesServiceProvider::class,
         Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class,
+        Cviebrock\EloquentSluggable\ServiceProvider::class,
+        Jasekz\Laradrop\LaradropServiceProvider::class,
         /*
          * Application Service Providers...
          */

@@ -5,6 +5,8 @@ namespace App\Models;
 use Eloquent as Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+
+
 /**
  * Class Project
  * @package App\Models
@@ -39,11 +41,11 @@ class Project extends Model
         'title',
         'year',
         'category_id',
-        'style_id',
+        'style',
         'price',
         'description',
         'address',
-        'image'
+        'image_id'
     ];
 
     /**
@@ -56,11 +58,11 @@ class Project extends Model
         'title' => 'string',
         'year' => 'integer',
         'category_id' => 'integer',
-        'style_id' => 'integer',
+        'style' => 'string',
         'price' => 'string',
         'description' => 'string',
         'address' => 'string',
-        'image' => 'integer'
+        'image_id' => 'integer'
     ];
 
     /**
@@ -69,8 +71,10 @@ class Project extends Model
      * @var array
      */
     public static $rules = [
-        
+        'title' => 'required',
+        'image' => 'required',
     ];
+
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
@@ -93,6 +97,6 @@ class Project extends Model
      **/
     public function files()
     {
-        return $this->hasMany(\App\Models\File::class);
+        return $this->hasMany(\App\Models\MyFile::class);
     }
 }
