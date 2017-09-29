@@ -1,10 +1,7 @@
 <?php
-
 namespace App\Repositories;
-
 use App\Models\MyFile;
 use InfyOm\Generator\Common\BaseRepository;
-
 /**
  * Class MyFileRepository
  * @package App\Repositories
@@ -13,7 +10,7 @@ use InfyOm\Generator\Common\BaseRepository;
  * @method MyFile findWithoutFail($id, $columns = ['*'])
  * @method MyFile find($id, $columns = ['*'])
  * @method MyFile first($columns = ['*'])
-*/
+ */
 class MyFileRepository extends BaseRepository
 {
     /**
@@ -26,7 +23,6 @@ class MyFileRepository extends BaseRepository
         'url',
         'name'
     ];
-
     /**
      * Configure the Model
      **/

@@ -31,14 +31,4 @@ class HomeController extends Controller
     public function register(){
         return view('auth.register');
     }
-
-    /**
-     * Generate Image upload View
-     *
-     * @return void
-     */
-    public function dropzone()
-    {
-        return view('dropzone');
-    }
 }

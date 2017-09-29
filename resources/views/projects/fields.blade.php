@@ -40,16 +40,13 @@
     {!! Form::text('address', null, ['class' => 'form-control']) !!}
 </div>
 
+<!-- Image Field -->
 @if(isset($image))
     <!-- Address Field -->
     <div class="form-group col-sm-12">
         {{ Form::label('image', 'Imagen Principal',['class' => 'control-label']) }}
-    </div>
-    <div class="form-group col-sm-12">
-        {{ Html::image($image->url) }}
-    </div>
-    <div class="form-group col-sm-12">
-        {{ Form::file('image',['class' => 'form-control'])}}
+        {!! $project->image->url !!}<br>
+        {{ Form::image($image->url) }}
     </div>
 @else
     <!-- Address Field -->
@@ -58,7 +55,6 @@
         {{ Form::file('image',['class' => 'form-control'])}}
     </div>
 @endif
-
 
 <!-- Submit Field -->
 <div class="form-group col-sm-12">

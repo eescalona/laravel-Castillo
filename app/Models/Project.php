@@ -72,7 +72,6 @@ class Project extends Model
      */
     public static $rules = [
         'title' => 'required',
-        'image' => 'required',
     ];
 
 
@@ -89,9 +88,8 @@ class Project extends Model
      **/
     public function image()
     {
-        return $this->hasOne(\App\Models\File::class,'id','image_id');
+        return $this->hasOne(\App\Models\MyFile::class,'id','image_id');
     }
-
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      **/

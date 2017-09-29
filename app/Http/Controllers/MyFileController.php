@@ -1,26 +1,22 @@
 <?php
-
 namespace App\Http\Controllers;
-
 use App\Http\Requests\CreateMyFileRequest;
 use App\Http\Requests\UpdateMyFileRequest;
 use App\Repositories\MyFileRepository;
+use Cviebrock\EloquentSluggable\Services\SlugService;
 use App\Http\Controllers\AppBaseController;
 use Illuminate\Http\Request;
 use Flash;
 use Prettus\Repository\Criteria\RequestCriteria;
 use Response;
-
 class MyFileController extends AppBaseController
 {
     /** @var  MyFileRepository */
     private $myFileRepository;
-
     public function __construct(MyFileRepository $myFileRepo)
     {
         $this->myFileRepository = $myFileRepo;
     }
-
     /**
      * Display a listing of the MyFile.
      *
@@ -31,11 +27,9 @@ class MyFileController extends AppBaseController
     {
         $this->myFileRepository->pushCriteria(new RequestCriteria($request));
         $myFiles = $this->myFileRepository->paginate(25);
-
         return view('my_files.index')
             ->with('myFiles', $myFiles);
     }
-
     /**
      * Show the form for creating a new MyFile.
      *
@@ -45,7 +39,6 @@ class MyFileController extends AppBaseController
     {
         return view('my_files.create');
     }
-
     /**
      * Store a newly created MyFile in storage.
      *
@@ -56,14 +49,10 @@ class MyFileController extends AppBaseController
     public function store(CreateMyFileRequest $request)
     {
         $input = $request->all();
-
         $myFile = $this->myFileRepository->create($input);
-
         Flash::success('My File saved successfully.');
-
         return redirect(route('myFiles.index'));
     }
-
     /**
      * Display the specified MyFile.
      *
@@ -74,16 +63,12 @@ class MyFileController extends AppBaseController
     public function show($id)
     {
         $myFile = $this->myFileRepository->findWithoutFail($id);
-
         if (empty($myFile)) {
             Flash::error('My File not found');
-
             return redirect(route('myFiles.index'));
         }
-
         return view('my_files.show')->with('myFile', $myFile);
     }
-
     /**
      * Show the form for editing the specified MyFile.
      *
@@ -94,16 +79,12 @@ class MyFileController extends AppBaseController
     public function edit($id)
     {
         $myFile = $this->myFileRepository->findWithoutFail($id);
-
         if (empty($myFile)) {
             Flash::error('My File not found');
-
             return redirect(route('myFiles.index'));
         }
-
         return view('my_files.edit')->with('myFile', $myFile);
     }
-
     /**
      * Update the specified MyFile in storage.
      *
@@ -115,20 +96,14 @@ class MyFileController extends AppBaseController
     public function update($id, UpdateMyFileRequest $request)
     {
         $myFile = $this->myFileRepository->findWithoutFail($id);
-
         if (empty($myFile)) {
             Flash::error('My File not found');
-
             return redirect(route('myFiles.index'));
         }
-
         $myFile = $this->myFileRepository->update($request->all(), $id);
-
         Flash::success('My File updated successfully.');
-
         return redirect(route('myFiles.index'));
     }
-
     /**
      * Remove the specified MyFile from storage.
      *
@@ -140,45 +115,26 @@ class MyFileController extends AppBaseController
     {
         echo "okkk";
         $myFile = $this->myFileRepository->findWithoutFail($id);
-
         if (empty($myFile)) {
             Flash::error('My File not found');
-
             return redirect(route('myFiles.index'));
         }
-
         $this->myFileRepository->delete($id);
-
         Flash::success('My File deleted successfully.');
-
         return redirect(route('myFiles.index'));
     }
-
     /**
      * Image Upload Code
      *
      * @return void
      */
-    public function dropzoneStore(Request $request)
+    public function dropzoneTEST(Request $request)
     {
-        $url = '/public/images/projects/';
-        $image = $request->file('file');
-        $imageName = time().$image->getClientOriginalName();
-        $image->move(public_path('images/projects'),$imageName);
-//        echo "okkk";
-//        $new_file = new MyFile();
-//        //$new_file->title  = $request->get('title');
-//        $new_file->name  = $imageName;
-//        $new_file->url = URL::to($url.$imageName);
-//
-//        $new_file->save();
-
-        return response()->json(['success'=>$imageName]);
+        return view('dropzone_test');
     }
-
     public function deleteUpload(Request $request)
     {
         return response()->json(['success'=>$request->file('file')]);
-       echo "okkk";
+        echo "okkk";
     }
 }

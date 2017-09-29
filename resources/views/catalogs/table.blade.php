@@ -1,16 +1,16 @@
 <table class="table table-responsive" id="catalogs-table">
     <thead>
         <th>Title</th>
-        <th>Url</th>
         <th>Imagen</th>
+        <th>Url</th>
         <th colspan="3">Action</th>
     </thead>
     <tbody>
     @foreach($catalogs as $catalog)
         <tr>
             <td>{!! $catalog->title !!}</td>
-            <td>{!! $catalog->url !!}</td>
             <td>{!! Html::image($catalog->image->url,'alt', array( 'width' => 70, 'height' => 70 )) !!}</td>
+            <td>{!! $catalog->url !!}</td>
             <td>
                 {!! Form::open(['route' => ['catalogs.destroy', $catalog->id], 'method' => 'delete']) !!}
                 <div class='btn-group'>

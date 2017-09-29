@@ -87,7 +87,7 @@
 
     <!-- Main Footer -->
     <footer class="main-footer" style="max-height: 100px;text-align: center">
-        <strong>Copyright © 2016 <a href="http://infyom.com" target="_blank">InfyOm Technologies</a>.</strong> All rights reserved.
+        <strong>Copyright © 2017 <a href="http://escalonasoftware.com" target="_blank">escalonasoftware</a>.</strong> All rights reserved.
     </footer>
 
 </div>

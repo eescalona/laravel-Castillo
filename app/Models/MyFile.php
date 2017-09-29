@@ -1,11 +1,8 @@
 <?php
-
 namespace App\Models;
-
 use Eloquent as Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Cviebrock\EloquentSluggable\Sluggable;
-
 /**
  * Class MyFile
  * @package App\Models
@@ -20,21 +17,15 @@ use Cviebrock\EloquentSluggable\Sluggable;
 class MyFile extends Model
 {
     public $table = 'files';
-
     const CREATED_AT = 'created_at';
     const UPDATED_AT = 'updated_at';
-
-
     protected $dates = [];
-
-
     public $fillable = [
         'project_id',
         'title',
         'slug',
         'url'
     ];
-
     /**
      * The attributes that should be casted to native types.
      *
@@ -48,17 +39,14 @@ class MyFile extends Model
         'slug' => 'string',
         'url' => 'string',
     ];
-
     /**
      * Validation rules
      *
      * @var array
      */
     public static $rules = [
-
     ];
     use Sluggable;
-
     /**
      * Return the sluggable configuration array for this model.
      *
@@ -79,6 +67,5 @@ class MyFile extends Model
     {
         return $this->belongsTo(\App\Models\Project::class);
     }
-
 
 }

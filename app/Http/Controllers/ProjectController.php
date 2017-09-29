@@ -4,21 +4,23 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\CreateProjectRequest;
 use App\Http\Requests\UpdateProjectRequest;
-use App\Models\File as MyFile;
-use App\Models\Project;
 use App\Repositories\ProjectRepository;
 use Illuminate\Http\Request;
+use App\Models\MyFile;
+use Intervention\Image\Facades\Image;
 use Flash;
 use Prettus\Repository\Criteria\RequestCriteria;
+use \Cviebrock\EloquentSluggable\Services\SlugService;
 use Response;
 use URL;
-use \Cviebrock\EloquentSluggable\Services\SlugService;
 use Html;
-use File;
+use App\Models\Project;
+use Illuminate\Support\Facades\File;
 
 class ProjectController extends AppBaseController
 {
-    const PROJECTS_IMAGES = '/public/images/projects/';
+    const PROJECTS_IMAGES = '/public/images/files/shares/Projects/';
+
     /** @var  ProjectRepository */
     private $projectRepository;
 
@@ -71,22 +73,42 @@ class ProjectController extends AppBaseController
             $name = pathinfo( $file->getClientOriginalName(), PATHINFO_FILENAME);
             $extension = pathinfo( $file->getClientOriginalName(), PATHINFO_EXTENSION);
             $slug = SlugService::createSlug(MyFile::class, 'slug', $name);
-            $url = self::PROJECTS_IMAGES;
+            $url = self::PROJECTS_IMAGES.'Principal/';
+            $urlThumb = $url.'thumbs/';
 
+            // create image
+            $request->file('image')->move(base_path().$url,$slug.'.'.$extension);
+
+            // create folder thumb if not exist
+            $result = File::exists(base_path().$urlThumb);
+            if ($result ==='false')
+            {
+                File::makeDirectory(base_path().$urlThumb, $mode = 0755, $recursive = true, $force = false);
+            }
+
+            // create thumb image
+            Image::make(base_path().$url.$slug.'.'.$extension)
+                ->fit(config('lfm.thumb_img_width', 200), config('lfm.thumb_img_height', 200))
+                ->save(base_path().$urlThumb.$slug.'.'.$extension);
+
+            // create MyFile
             $new_file = new MyFile();
             $new_file->title  = $request->get('title');
             $new_file->name  = $name;
             $new_file->url = URL::to($url.$slug.'.'.$extension);
-
-            $request->file('image')->move(base_path().$url,$slug.'.'.$extension);
             $new_file->save();
             $input['image_id'] = $new_file->id;
         }
 
         $project = $this->projectRepository->create($input);
+
         if($request->hasFile('image')) {
             $new_file->project_id = $project->id;
             $new_file->save();
+
+            // Creamos la carpeta para meter el resto de fotos
+            $urlProject = self::PROJECTS_IMAGES.$project->id.'-'.$project->title;
+            File::makeDirectory(base_path().$urlProject, $mode = 0755, $recursive = true, $force = false);
         }
         Flash::success('Project saved successfully.');
 
@@ -144,7 +166,8 @@ class ProjectController extends AppBaseController
      */
     public function update($id, UpdateProjectRequest $request)
     {
-        // TODO try - catch con transaccion de base de datos
+        // TODO try - catch con transaccion de base de datos.
+        // TODO no se puede editar imagen
         $input = $request->all();
 
         if($request->hasFile('image')){
@@ -200,7 +223,7 @@ class ProjectController extends AppBaseController
 
             return redirect(route('projects.index'));
         }
-
+//TODO Delete MyFile, archivo, thumb y carpeta relacionada
         $this->projectRepository->delete($id);
 
         Flash::success('Project deleted successfully.');

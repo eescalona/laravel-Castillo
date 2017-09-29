@@ -10,9 +10,10 @@
         <div class="box box-primary">
             <div class="box-body">
                 <div class="row" style="padding-left: 20px">
-                    <a href="{!! route('projects.index') !!}" class="btn btn-default">Back</a>
                     @include('projects.show_fields')
-
+                    <div class="form-group col-sm-12">
+                        <a href="{!! route('projects.index') !!}" class="btn btn-default">Back</a>
+                    </div>
                 </div>
             </div>
         </div>

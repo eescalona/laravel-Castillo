@@ -12,7 +12,8 @@
 
 <li class="{{ Request::is('register*') ? 'active' : '' }}">
     <a href="{{ route('user.admin.register.view') }}"><i class="fa fa-user"></i><span>Register New User</span></a>
-</li><li class="{{ Request::is('myFiles*') ? 'active' : '' }}">
-    <a href="{!! route('myFiles.index') !!}"><i class="fa fa-edit"></i><span>MyFiles</span></a>
+</li>
+<li class="{{ Request::is('gallery*') ? 'active' : '' }}">
+    <a href="{{ route('yourRoute.view') }}"><i class="fa fa-picture-o"></i><span>Gallery</span></a>
 </li>
 

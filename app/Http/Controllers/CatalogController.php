@@ -4,19 +4,21 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\CreateCatalogRequest;
 use App\Http\Requests\UpdateCatalogRequest;
-use App\Models\File;
 use App\Repositories\CatalogRepository;
 use Illuminate\Http\Request;
+use App\Models\MyFile;
+use Intervention\Image\Facades\Image;
+use Illuminate\Support\Facades\File;
 use Flash;
 use Prettus\Repository\Criteria\RequestCriteria;
+use \Cviebrock\EloquentSluggable\Services\SlugService;
 use Response;
 use URL;
-use \Cviebrock\EloquentSluggable\Services\SlugService;
 use Html;
 
 class CatalogController extends AppBaseController
 {
-    const PROJECTS_IMAGES = '/public/images/Catalogs/';
+    const PROJECTS_IMAGES = '/public/images/files/shares/Catalogs/';
     /** @var  CatalogRepository */
     private $catalogRepository;
 
@@ -66,15 +68,30 @@ class CatalogController extends AppBaseController
             $file = $request->file('image');
             $name = pathinfo( $file->getClientOriginalName(), PATHINFO_FILENAME);
             $extension = pathinfo( $file->getClientOriginalName(), PATHINFO_EXTENSION);
-            $slug = SlugService::createSlug(File::class, 'slug', $name);
+            $slug = SlugService::createSlug(MyFile::class, 'slug', $name);
             $url = self::PROJECTS_IMAGES;
+            $urlThumb = $url.'/thumbs/';
 
-            $new_file = new File();
+            // create image
+            $file->move(base_path().$url,$slug.'.'.$extension);
+
+            // create folder thumb if not exist
+            $result = File::exists(base_path().$urlThumb);
+            if ($result ==='false')
+            {
+                File::makeDirectory(base_path().$urlThumb, $mode = 0755, $recursive = true, $force = false);
+            }
+
+            // create thumb image
+            Image::make(base_path().$url.$slug.'.'.$extension)
+                ->fit(config('lfm.thumb_img_width', 200), config('lfm.thumb_img_height', 200))
+                ->save(base_path().$urlThumb.$slug.'.'.$extension);
+
+            // create MyFile
+            $new_file = new MyFile();
             $new_file->title  = $request->get('title');
             $new_file->name  = $name;
             $new_file->url = URL::to($url.$slug.'.'.$extension);
-
-            $request->file('image')->move(base_path().$url,$slug.'.'.$extension);
             $new_file->save();
             $input['image_id'] = $new_file->id;
         }
@@ -84,6 +101,7 @@ class CatalogController extends AppBaseController
 
         return redirect(route('catalogs.index'));
     }
+
 
     /**
      * Display the specified Catalog.
@@ -168,7 +186,7 @@ class CatalogController extends AppBaseController
         }
 
         $this->catalogRepository->delete($id);
-
+//TODO Delete MyFile, archivo y thumb
         Flash::success('Catalog deleted successfully.');
 
         return redirect(route('catalogs.index'));
