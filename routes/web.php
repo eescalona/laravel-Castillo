@@ -20,17 +20,11 @@ Auth::routes();
 
 Route::get('/home', 'HomeController@index');
 
-Route::get('/laravel-filemanager', '\Unisharp\Laravelfilemanager\controllers\LfmController@show');
-Route::post('/laravel-filemanager', '\Unisharp\Laravelfilemanager\controllers\LfmController@show');
-Route::get('/gallery', ['as' => 'yourRoute.view','uses' => 'MyLaradropController@view']);
-Route::get('/gallery/projects/{id}', ['as' => 'filemanager.project.gallery','uses' => 'MyLaradropController@getConnectors']);
+Route::get('/gallery', ['as' => 'gallery.view','uses' => 'MyFileController@view']);
 
 Route::resource('projects', 'ProjectController');
-Route::group(['prefix' => 'projects', 'middleware' => ['web']], function () {
-    Route::get('{id}/gallegy',['as'=>'projects.admin.gallery.view', 'uses' => 'ProjectController@galleryView']);
-});
-Route::resource('catalogs', 'CatalogController');
 
+Route::resource('catalogs', 'CatalogController');
 
 Route::group(['prefix' => 'users', 'middleware' => ['web']], function () {
     Route::get('/register',['as'=>'user.admin.register.view', 'uses' => 'HomeController@register']);

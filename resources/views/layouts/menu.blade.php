@@ -14,6 +14,6 @@
     <a href="{{ route('user.admin.register.view') }}"><i class="fa fa-user"></i><span>Register New User</span></a>
 </li>
 <li class="{{ Request::is('gallery*') ? 'active' : '' }}">
-    <a href="{{ route('yourRoute.view') }}"><i class="fa fa-picture-o"></i><span>Gallery</span></a>
+    <a href="{{ route('gallery.view') }}"><i class="fa fa-picture-o"></i><span>Gallery</span></a>
 </li>
 

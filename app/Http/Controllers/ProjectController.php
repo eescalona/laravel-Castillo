@@ -24,7 +24,6 @@ class ProjectController extends AppBaseController
     /** @var  ProjectRepository */
     private $projectRepository;
 
-
     public function __construct(ProjectRepository $projectRepo)
     {
         $this->projectRepository = $projectRepo;
@@ -68,48 +67,57 @@ class ProjectController extends AppBaseController
         // TODO try - catch con transaccion de base de datos
         $input = $request->all();
         $this->validate($request,Project::$rules);
-        if($request->hasFile('image')){
-            $file = $request->file('image');
-            $name = pathinfo( $file->getClientOriginalName(), PATHINFO_FILENAME);
-            $extension = pathinfo( $file->getClientOriginalName(), PATHINFO_EXTENSION);
-            $slug = SlugService::createSlug(MyFile::class, 'slug', $name);
-            $url = self::PROJECTS_IMAGES.'Principal/';
-            $urlThumb = $url.'thumbs/';
 
-            // create image
-            $request->file('image')->move(base_path().$url,$slug.'.'.$extension);
-
-            // create folder thumb if not exist
-            $result = File::exists(base_path().$urlThumb);
-            if ($result ==='false')
-            {
-                File::makeDirectory(base_path().$urlThumb, $mode = 0755, $recursive = true, $force = false);
-            }
-
-            // create thumb image
-            Image::make(base_path().$url.$slug.'.'.$extension)
-                ->fit(config('lfm.thumb_img_width', 200), config('lfm.thumb_img_height', 200))
-                ->save(base_path().$urlThumb.$slug.'.'.$extension);
-
-            // create MyFile
-            $new_file = new MyFile();
-            $new_file->title  = $request->get('title');
-            $new_file->name  = $name;
-            $new_file->url = URL::to($url.$slug.'.'.$extension);
-            $new_file->save();
-            $input['image_id'] = $new_file->id;
+        // validate if exist file
+        if(!$request->hasFile('image')) {
+            Flash::error('Imagen Obligatoria.');
+            dd('Imagen Obligatoria.');
         }
 
+        // get info for MyFile
+        $file = $request->file('image');
+        $name = pathinfo( $file->getClientOriginalName(), PATHINFO_FILENAME);
+        $extension = pathinfo( $file->getClientOriginalName(), PATHINFO_EXTENSION);
+        $slug = SlugService::createSlug(MyFile::class, 'slug', $name);
+        $slug = $slug.'.'.$extension;
+
+        // create MyFile
+        $new_file = new MyFile();
+        $new_file->title  = $request->get('title');
+        $new_file->name  = $name;
+        $new_file->slug = $slug;
+        $new_file->url = $slug; // url must be not null, after we update it.
+        $new_file->save();
+
+        // create Project
+        $input['image_id'] = $new_file->id;
         $project = $this->projectRepository->create($input);
 
-        if($request->hasFile('image')) {
-            $new_file->project_id = $project->id;
-            $new_file->save();
+        // create folder project
+        $urlProject = self::PROJECTS_IMAGES.$project->id.'-'.$project->title;
+        File::makeDirectory(base_path().$urlProject, $mode = 0755, $recursive = true, $force = false);
 
-            // Creamos la carpeta para meter el resto de fotos
-            $urlProject = self::PROJECTS_IMAGES.$project->id.'-'.$project->title;
-            File::makeDirectory(base_path().$urlProject, $mode = 0755, $recursive = true, $force = false);
-        }
+        // create folder principal
+        $urlPrincipal = $urlProject.'/Principal/';
+        File::makeDirectory(base_path().$urlPrincipal, $mode = 0755, $recursive = true, $force = false);
+
+        // create principal image
+        $request->file('image')->move(base_path().$urlPrincipal,$slug);
+
+        // create folder thumb if not exist
+        $urlThumb = $urlPrincipal.'thumbs/';
+        File::makeDirectory(base_path().$urlThumb, $mode = 0755, $recursive = true, $force = false);
+
+        // create thumb image
+        Image::make(base_path().$urlPrincipal.$slug)
+            ->fit(config('lfm.thumb_img_width', 200), config('lfm.thumb_img_height', 200))
+            ->save(base_path().$urlThumb.$slug);
+
+        // Update MyFile
+        $new_file->url = URL::to($urlPrincipal.$slug);
+        $new_file->project_id = $project->id;
+        $new_file->save();
+
         Flash::success('Project saved successfully.');
 
         return redirect(route('projects.index'));
@@ -167,41 +175,97 @@ class ProjectController extends AppBaseController
     public function update($id, UpdateProjectRequest $request)
     {
         // TODO try - catch con transaccion de base de datos.
-        // TODO no se puede editar imagen
-        $input = $request->all();
 
-        if($request->hasFile('image')){
+        $old_project = $this->projectRepository->findWithoutFail($id);
+
+        if($request->hasFile('image'))
+        {
             $file = $request->file('image');
 
             $name = pathinfo( $file->getClientOriginalName(), PATHINFO_FILENAME);
             $extension = pathinfo( $file->getClientOriginalName(), PATHINFO_EXTENSION);
             $slug = SlugService::createSlug(MyFile::class, 'slug', $name);
-            $url = self::PROJECTS_IMAGES;
+            $slug = $slug.'.'.$extension;
+            $urlProject = self::PROJECTS_IMAGES.$old_project->id.'-'.$old_project->title;
 
-            $new_file = new MyFile();
-            $new_file->title  = $request->get('title');
-            $new_file->name  = $name;
-            $new_file->url = URL::to($url.$slug.'.'.$extension);
+            if($request->get('title') === $old_project->title)
+            {
+                // delete folder principal
+                $urlPrincipal = $urlProject.'/Principal/';
+                File::deleteDirectory(base_path().$urlPrincipal, $preserve = false);
+            }
+            else
+            {
+                // delete folder project
+                File::deleteDirectory(base_path().$urlProject, $preserve = false);
 
-            $request->file('image')->move(base_path().$url,$slug.'.'.$extension);
-            $new_file->save();
-            $input['image_id'] = $new_file->id;
+                // create folder project
+                $urlProject = self::PROJECTS_IMAGES.$old_project->id.'-'.$request->get('title');
+                File::makeDirectory(base_path().$urlProject, $mode = 0755, $recursive = true, $force = false);
+            }
+
+            // create folder principal
+            $urlPrincipal = $urlProject.'/Principal/';
+            File::makeDirectory(base_path().$urlPrincipal, $mode = 0755, $recursive = true, $force = false);
+
+            // create principal image
+            $request->file('image')->move(base_path().$urlPrincipal,$slug);
+
+            // create folder thumb if not exist
+            $urlThumb = $urlPrincipal.'thumbs/';
+            File::makeDirectory(base_path().$urlThumb, $mode = 0755, $recursive = true, $force = false);
+
+            // create thumb image
+            Image::make(base_path().$urlPrincipal.$slug)
+                ->fit(config('lfm.thumb_img_width', 200), config('lfm.thumb_img_height', 200))
+                ->save(base_path().$urlThumb.$slug);
+
+            $old_file = MyFile::where('id','=',$old_project->image->id)->first();
+            $old_file->title  = $request->get('title');
+            $old_file->name  = $name;
+            $old_file->slug  = $slug;
+            $old_file->url = URL::to($urlPrincipal.$slug);
+            $old_file->save();
+        }else{
+            // No new image
+            if($request->get('title') !== $old_project->title)
+            {
+                $old_file = MyFile::where('id','=',$old_project->image->id)->first();
+
+                // delete folder project
+                $urlProject = self::PROJECTS_IMAGES.$old_project->id.'-'.$old_project->title;
+                File::deleteDirectory(base_path().$urlProject, $preserve = false);
+
+                // create folder project
+                $urlProject = self::PROJECTS_IMAGES.$old_project->id.'-'.$request->get('title');
+                File::makeDirectory(base_path().$urlProject, $mode = 0755, $recursive = true, $force = false);
+
+                // create folder principal
+                $urlPrincipal = $urlProject.'/Principal/';
+                File::makeDirectory(base_path().$urlPrincipal, $mode = 0755, $recursive = true, $force = false);
+
+                // create principal image
+                $request->file('image')->move(base_path().$urlPrincipal,$old_file->slug);
+
+                // create folder thumb if not exist
+                $urlThumb = $urlPrincipal.'thumbs/';
+                File::makeDirectory(base_path().$urlThumb, $mode = 0755, $recursive = true, $force = false);
+
+                // create thumb image
+                Image::make(base_path().$urlPrincipal.$old_file->slug)
+                    ->fit(config('lfm.thumb_img_width', 200), config('lfm.thumb_img_height', 200))
+                    ->save(base_path().$urlThumb.$old_file->slug);
+
+
+                $old_file->title  = $request->get('title');
+                $old_file->url = URL::to($urlPrincipal.$old_file->slug);
+                $old_file->save();
+            }
         }
 
-        $project = $this->projectRepository->findWithoutFail($id);
-        $file_delete = $project->image;
-        if (empty($project)) {
-            Flash::error('Project not found');
-
-            return redirect(route('projects.index'));
-        }
-
+        $input = $request->all();
         $project = $this->projectRepository->update($input, $id);
-        if($request->hasFile('image')){
-            //File::delete($file_delete->slug);
-            unlink ($file_delete->url);
-            $file_delete->delete();
-        }
+
         Flash::success('Project updated successfully.');
 
         return redirect(route('projects.index'));
@@ -223,23 +287,15 @@ class ProjectController extends AppBaseController
 
             return redirect(route('projects.index'));
         }
-//TODO Delete MyFile, archivo, thumb y carpeta relacionada
+
+        // delete folder project
+        $urlProject = self::PROJECTS_IMAGES.$project->id.'-'.$project->title;
+        File::deleteDirectory(base_path().$urlProject, $preserve = false);
+
         $this->projectRepository->delete($id);
 
         Flash::success('Project deleted successfully.');
 
         return redirect(route('projects.index'));
-    }
-
-    public function galleryView($id){
-        $project = $this->projectRepository->findWithoutFail($id);
-
-        if (empty($project)) {
-            Flash::error('Project not found');
-
-            return redirect(route('projects.index'));
-        }
-
-        return view('projects.gallery')->with('project', $project);
     }
 }

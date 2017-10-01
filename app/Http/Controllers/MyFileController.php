@@ -11,6 +11,10 @@ use Prettus\Repository\Criteria\RequestCriteria;
 use Response;
 class MyFileController extends AppBaseController
 {
+    public function view(){
+        return view('gallery');
+    }
+
     /** @var  MyFileRepository */
     private $myFileRepository;
     public function __construct(MyFileRepository $myFileRepo)

@@ -8,7 +8,7 @@
 @section('content')
     <section class="content-header">
         <h1>
-            Gallery <a href="{!! route('projects.index') !!}" class="btn btn-default">Back</a>
+            Gallery
         </h1>
     </section>
     <div class="content">

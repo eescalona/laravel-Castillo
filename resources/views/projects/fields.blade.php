@@ -44,14 +44,15 @@
 @if(isset($image))
     <!-- Address Field -->
     <div class="form-group col-sm-12">
-        {{ Form::label('image', 'Imagen Principal',['class' => 'control-label']) }}
+        {{ Form::label('image', 'Imagen Principal: ',['class' => 'control-label']) }}
         {!! $project->image->url !!}<br>
         {{ Form::image($image->url) }}
+        {{ Form::file('image',['class' => 'form-control'])}}
     </div>
 @else
     <!-- Address Field -->
     <div class="form-group col-sm-12">
-        {{ Form::label('image', 'Imagen Principal ',['class' => 'control-label'])}}
+        {{ Form::label('image', 'Imagen Principal: ',['class' => 'control-label'])}}
         {{ Form::file('image',['class' => 'form-control'])}}
     </div>
 @endif
