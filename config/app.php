@@ -176,7 +176,6 @@ return [
         Cviebrock\EloquentSluggable\ServiceProvider::class,
 
 
-        Jasekz\Laradrop\LaradropServiceProvider::class,
         Unisharp\Laravelfilemanager\LaravelFilemanagerServiceProvider::class,
         Intervention\Image\ImageServiceProvider::class,
         /*
