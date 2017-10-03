@@ -17,8 +17,8 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::get('projects/{input}/', 'ProjectAPIController@show');
+Route::get('projects/{project_id}/', 'ProjectAPIController@show');
 Route::get('projects/{project_id}/gallery', 'ProjectAPIController@gallery');
-Route::get('/projects/categories/{category_id}')->uses('ProjectAPIController@index');
+Route::get('/projects/categories/{category_slug}')->uses('ProjectAPIController@index');
 
 Route::resource('catalogs', 'CatalogAPIController');

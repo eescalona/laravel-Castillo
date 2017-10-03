@@ -5,7 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Requests\API\CreateProjectAPIRequest;
 use App\Http\Requests\API\UpdateProjectAPIRequest;
 use App\Models\Category;
-use App\Models\File;
+use App\Models\MyFile;
 use App\Models\Project;
 use App\Repositories\ProjectRepository;
 use Illuminate\Http\Request;
@@ -31,21 +31,21 @@ class ProjectAPIController extends AppBaseController
     }
 
     /**
-     * Display a listing of the Project.
+     * Display a listing of the Project filter by category.
      * GET|HEAD /projects
      *
-     * @param Request $request
+     * @param Request $request, $category_slug
      * @return Response
      */
-    public function index(Request $request,$category_id = NULL)
+    public function index(Request $request,$category_slug = NULL)
     {
         $this->projectRepository->pushCriteria(new RequestCriteria($request));
         $this->projectRepository->pushCriteria(new LimitOffsetCriteria($request));
 
-        if($category_id == NULL){
+        if($category_slug == NULL){
             $projects = $this->projectRepository->All();
         } else{
-            $category = Category::whereSlug($category_id)->first();
+            $category = Category::whereSlug($category_slug)->first();
             if(is_null($category)){
                 return $this->sendResponse(NULL, 'Category not found');
             }
@@ -78,19 +78,20 @@ class ProjectAPIController extends AppBaseController
         return $this->sendResponse($projects->toArray(), 'Projects retrieved successfully');
     }
 
+    /**
+     * Display a listing of the Project.
+     * GET|HEAD /projects
+     *
+     * @param Request $request
+     * @return Response
+     */
     public function gallery(Request $request, $project_id){
         $principal_image = Project::whereId($project_id)->first()->image;
-        $all_files = File::whereProjectId($project_id)
+        $all_files = MyFile::whereProjectId($project_id)
             ->where('id', '<>',$principal_image->id)
             ->get();
         $all_files->prepend($principal_image);
         return $this->sendResponse($all_files, 'Gallery retrieved successfully');
-
-    }
-
-
-    public function test(Request $request, string $input, integer $id = null){
-        return $this->sendResponse($input.$id, 'Projects retrieved successfully');
 
     }
 
@@ -134,6 +135,29 @@ class ProjectAPIController extends AppBaseController
             }
         }
 
+        // get next and previous item on the list
+        $list=Project::whereCategoryId($project->category_id)->orderBy('id', 'DESC')->get();
+        $project_pos =-1;
+        $list->filter(function($collection) use ($project, &$project_pos) {
+            $project_pos++;
+            if ($collection->id === $project->id) {
+                return true;
+            }
+            return false;
+        });
+        $project_pos--;
+        $maxItem = $list->count()-1;
+        if ($project_pos == $maxItem) {
+            $project->next_id = 0;
+        } else {
+            $project->next_id = $list[$project_pos+1]->id;
+        }
+
+        if ($project_pos == 0) {
+            $project->prev_id = 0;
+        } else {
+            $project->prev_id = $list[$project_pos-1]->id;
+        }
 
         return $this->sendResponse($project->toArray(), 'Project retrieved successfully');
     }
