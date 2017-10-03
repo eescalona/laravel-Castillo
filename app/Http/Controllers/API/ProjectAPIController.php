@@ -137,16 +137,17 @@ class ProjectAPIController extends AppBaseController
 
         // get next and previous item on the list
         $list=Project::whereCategoryId($project->category_id)->orderBy('id', 'DESC')->get();
-        $project_pos =-1;
-        $list->filter(function($collection) use ($project, &$project_pos) {
-            $project_pos++;
+        $listFilter=$list->filter(function($collection) use ($project, &$project_pos) {
             if ($collection->id === $project->id) {
                 return true;
             }
             return false;
         });
-        $project_pos--;
+
+        $keys = $listFilter->keys();
+        $project_pos =$keys->first();
         $maxItem = $list->count()-1;
+
         if ($project_pos == $maxItem) {
             $project->next_id = 0;
         } else {
