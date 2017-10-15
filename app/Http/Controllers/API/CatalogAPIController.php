@@ -11,6 +11,7 @@ use App\Http\Controllers\AppBaseController;
 use InfyOm\Generator\Criteria\LimitOffsetCriteria;
 use Prettus\Repository\Criteria\RequestCriteria;
 use Response;
+use Illuminate\Support\Facades\File;
 
 /**
  * Class CatalogController
@@ -47,6 +48,8 @@ class CatalogAPIController extends AppBaseController
             }else{
                 $catalog->image_url = '';
             }
+            $catalog->extension = File::extension($catalog->url);
+
             return $catalog;
         });
 
