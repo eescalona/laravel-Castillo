@@ -29,8 +29,10 @@ class MyFileController extends AppBaseController
      */
     public function index(Request $request)
     {
+
         $this->myFileRepository->pushCriteria(new RequestCriteria($request));
         $myFiles = $this->myFileRepository->paginate(25);
+
         return view('my_files.index')
             ->with('myFiles', $myFiles);
     }

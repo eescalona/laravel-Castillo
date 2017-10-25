@@ -22,3 +22,4 @@ Route::get('projects/{project_id}/gallery', 'ProjectAPIController@gallery');
 Route::get('/projects/categories/{category_slug}')->uses('ProjectAPIController@index');
 
 Route::resource('catalogs', 'CatalogAPIController');
+Route::resource('promotions', 'PromotionsAPIController');

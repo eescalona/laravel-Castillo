@@ -19,7 +19,7 @@ use Html;
 
 class CatalogController extends AppBaseController
 {
-    const PROJECTS_IMAGES = '/public/images/files/shares/Catalogs/';
+    const CATALOGS_IMAGES = '/public/images/files/shares/Catalogs/';
 
     /** @var  CatalogRepository */
     private $catalogRepository;
@@ -72,7 +72,7 @@ class CatalogController extends AppBaseController
             $extension = pathinfo( $file->getClientOriginalName(), PATHINFO_EXTENSION);
             $slug = SlugService::createSlug(MyFile::class, 'slug', $name);
             $slug = $slug.'.'.$extension;
-            $url = self::PROJECTS_IMAGES;
+            $url = self::CATALOGS_IMAGES;
             $urlThumb = $url.'thumbs/';
 
             // create folder catalog if not exist
@@ -105,7 +105,11 @@ class CatalogController extends AppBaseController
             $new_file->url = URL::to($url.$slug);
             $new_file->save();
             $input['image_id'] = $new_file->id;
+        }else{
+            Flash::error('Imagen Obligatoria.');
+            return redirect(route('catalogs.create'))->withInput($request->all());
         }
+
         $catalog = $this->catalogRepository->create($input);
 
         Flash::success('Catalog saved successfully.');
@@ -195,16 +199,15 @@ class CatalogController extends AppBaseController
             return redirect(route('catalogs.index'));
         }
 
-        $url = self::PROJECTS_IMAGES;
+
+
+        $url = self::CATALOGS_IMAGES;
         $urlThumb = $url.'/thumbs/';
         $old_file = MyFile::where('id','=',$catalog->image_id)->first();
 
-        // No elimina los ficheros
-        File::delete($url.$old_file->slug);
-//        File::delete(base_path().$urlThumb.$old_file->slug);
-
-//        Storage::delete(base_path().$url.$old_file->slug);
-        Storage::delete($urlThumb.$old_file->slug);
+        // Delete the images files
+        File::delete(base_path().$url.$old_file->slug);
+        File::delete(base_path().$urlThumb.$old_file->slug);
 
         $old_file->delete();
 

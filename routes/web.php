@@ -21,11 +21,15 @@ Auth::routes();
 Route::get('/home', 'HomeController@index');
 
 Route::get('/gallery', ['as' => 'gallery.view','uses' => 'MyFileController@view']);
+Route::get('/projects/{category}/filter', ['as' => 'projects.filter','uses' => 'ProjectController@filtered']);
 
 Route::resource('projects', 'ProjectController');
 
 Route::resource('catalogs', 'CatalogController');
 
+Route::resource('promotions', 'PromotionsController');
+
 Route::group(['prefix' => 'users', 'middleware' => ['web']], function () {
     Route::get('/register',['as'=>'user.admin.register.view', 'uses' => 'HomeController@register']);
 });
+

@@ -18,7 +18,7 @@
         {!! Form::image($catalog->image->url) !!}
     </div>
 @else
-    <!-- Address Field -->
+    <!-- Image Field -->
     <div class="form-group col-sm-12">
         {{ Form::label('image', 'Imagen Principal',['class' => 'control-label']) }}
     </div>

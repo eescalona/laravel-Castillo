@@ -3,20 +3,18 @@
 @section('content')
     <section class="content-header">
         <h1>
-            Project
+            Promotions
         </h1>
     </section>
     <div class="content">
         @include('adminlte-templates::common.errors')
-        @include('flash::message')
-
         <div class="box box-primary">
 
             <div class="box-body">
                 <div class="row">
-                    {!! Form::open(['route' => 'projects.store','files' => true]) !!}
+                    {!! Form::open(['route' => 'promotions.store','files' => true]) !!}
 
-                        @include('projects.fields')
+                        @include('promotions.fields')
 
                     {!! Form::close() !!}
                 </div>

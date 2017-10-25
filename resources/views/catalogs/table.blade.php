@@ -1,3 +1,4 @@
+{{ $catalogs->links() }}
 <table class="table table-responsive" id="catalogs-table">
     <thead>
         <th>Title</th>
@@ -24,3 +25,4 @@
     @endforeach
     </tbody>
 </table>
+{{ $catalogs->links() }}

@@ -6,26 +6,30 @@ use Eloquent as Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- * Class Catalog
+ * Class Promotions
  * @package App\Models
- * @version September 16, 2017, 4:32 pm UTC
+ * @version October 20, 2017, 11:40 pm UTC
  *
+ * @property integer id
  * @property string title
- * @property integer image
- * @property string url
+ * @property integer image_id
+ * @property string pdf
  */
-class Catalog extends Model
+class Promotions extends Model
 {
-    public $table = 'catalogs';
+    public $table = 'promotions';
     
     const CREATED_AT = 'created_at';
     const UPDATED_AT = 'updated_at';
 
 
+    protected $dates = ['deleted_at'];
+
+
     public $fillable = [
         'title',
         'image_id',
-        'url'
+        'pdf'
     ];
 
     /**
@@ -37,7 +41,7 @@ class Catalog extends Model
         'id' => 'integer',
         'title' => 'string',
         'image_id' => 'integer',
-        'url' => 'string'
+        'pdf' => 'string'
     ];
 
     /**
@@ -47,8 +51,8 @@ class Catalog extends Model
      */
     public static $rules = [
         'title' => 'required',
-        'url' => 'required',
         'image' => 'required',
+        'filePdf' => 'required',
     ];
 
     /**
@@ -58,5 +62,4 @@ class Catalog extends Model
     {
         return $this->hasOne(\App\Models\MyFile::class,'id','image_id');
     }
-    
 }

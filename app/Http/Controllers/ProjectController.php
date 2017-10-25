@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\CreateProjectRequest;
 use App\Http\Requests\UpdateProjectRequest;
 use App\Repositories\ProjectRepository;
+use function Couchbase\defaultDecoder;
 use Illuminate\Http\Request;
 use App\Models\MyFile;
 use Intervention\Image\Facades\Image;
@@ -37,9 +38,32 @@ class ProjectController extends AppBaseController
      */
     public function index(Request $request)
     {
-        //return "mi test";
         $this->projectRepository->pushCriteria(new RequestCriteria($request));
         $projects = $this->projectRepository->orderBy('id', 'DESC')->paginate(25);
+
+        return view('projects.index')
+            ->with('projects', $projects);
+    }
+
+    /**
+     * Display a listing of the Project.
+     *
+     * @param Request $request
+     * @return Response
+     */
+    public function filtered(Request $request,$category)
+    {
+        $this->projectRepository->pushCriteria(new RequestCriteria($request));
+        switch ($category){
+            case 'cocinas': $projects_filter = Project::where('category_id','=',1); break;
+            case 'armarios': $projects_filter = Project::where('category_id','=',2); break;
+            default:
+                $this->projectRepository->pushCriteria(new RequestCriteria($request));
+                $projects = $this->projectRepository->orderBy('id', 'DESC')->paginate(25);
+                return view('projects.index')->with('projects', $projects);
+            break;
+        }
+        $projects = $projects_filter->orderBy('id', 'DESC')->paginate(25);
 
         return view('projects.index')
             ->with('projects', $projects);
@@ -71,7 +95,7 @@ class ProjectController extends AppBaseController
         // validate if exist file
         if(!$request->hasFile('image')) {
             Flash::error('Imagen Obligatoria.');
-            dd('Imagen Obligatoria.');
+            return redirect(route('projects.create'))->withInput($request->all());
         }
 
         // get info for MyFile
@@ -94,7 +118,8 @@ class ProjectController extends AppBaseController
         $project = $this->projectRepository->create($input);
 
         // create folder project
-        $urlProject = self::PROJECTS_IMAGES.$project->id.'-'.$project->title;
+        $id= sprintf("%04d",$project->id);
+        $urlProject = self::PROJECTS_IMAGES.$id.'-'.$project->title;
         File::makeDirectory(base_path().$urlProject, $mode = 0755, $recursive = true, $force = false);
 
         // create folder principal
@@ -186,23 +211,12 @@ class ProjectController extends AppBaseController
             $extension = pathinfo( $file->getClientOriginalName(), PATHINFO_EXTENSION);
             $slug = SlugService::createSlug(MyFile::class, 'slug', $name);
             $slug = $slug.'.'.$extension;
-            $urlProject = self::PROJECTS_IMAGES.$old_project->id.'-'.$old_project->title;
+            $id= sprintf("%04d",$old_project->id);
+            $urlProject = self::PROJECTS_IMAGES.$id.'-'.$old_project->title;
 
-            if($request->get('title') === $old_project->title)
-            {
-                // delete folder principal
-                $urlPrincipal = $urlProject.'/Principal/';
-                File::deleteDirectory(base_path().$urlPrincipal, $preserve = false);
-            }
-            else
-            {
-                // delete folder project
-                File::deleteDirectory(base_path().$urlProject, $preserve = false);
-
-                // create folder project
-                $urlProject = self::PROJECTS_IMAGES.$old_project->id.'-'.$request->get('title');
-                File::makeDirectory(base_path().$urlProject, $mode = 0755, $recursive = true, $force = false);
-            }
+            // delete folder principal
+            $urlPrincipal = $urlProject.'/Principal/';
+            File::deleteDirectory(base_path().$urlPrincipal, $preserve = false);
 
             // create folder principal
             $urlPrincipal = $urlProject.'/Principal/';
@@ -221,46 +235,10 @@ class ProjectController extends AppBaseController
                 ->save(base_path().$urlThumb.$slug);
 
             $old_file = MyFile::where('id','=',$old_project->image->id)->first();
-            $old_file->title  = $request->get('title');
             $old_file->name  = $name;
             $old_file->slug  = $slug;
             $old_file->url = URL::to($urlPrincipal.$slug);
             $old_file->save();
-        }else{
-            // No new image
-            if($request->get('title') !== $old_project->title)
-            {
-                $old_file = MyFile::where('id','=',$old_project->image->id)->first();
-
-                // delete folder project
-                $urlProject = self::PROJECTS_IMAGES.$old_project->id.'-'.$old_project->title;
-                File::deleteDirectory(base_path().$urlProject, $preserve = false);
-
-                // create folder project
-                $urlProject = self::PROJECTS_IMAGES.$old_project->id.'-'.$request->get('title');
-                File::makeDirectory(base_path().$urlProject, $mode = 0755, $recursive = true, $force = false);
-
-                // create folder principal
-                $urlPrincipal = $urlProject.'/Principal/';
-                File::makeDirectory(base_path().$urlPrincipal, $mode = 0755, $recursive = true, $force = false);
-
-                // create principal image
-                $request->file('image')->move(base_path().$urlPrincipal,$old_file->slug);
-
-                // create folder thumb if not exist
-                $urlThumb = $urlPrincipal.'thumbs/';
-                File::makeDirectory(base_path().$urlThumb, $mode = 0755, $recursive = true, $force = false);
-
-                // create thumb image
-                Image::make(base_path().$urlPrincipal.$old_file->slug)
-                    ->fit(config('lfm.thumb_img_width', 200), config('lfm.thumb_img_height', 200))
-                    ->save(base_path().$urlThumb.$old_file->slug);
-
-
-                $old_file->title  = $request->get('title');
-                $old_file->url = URL::to($urlPrincipal.$old_file->slug);
-                $old_file->save();
-            }
         }
 
         $input = $request->all();
@@ -289,7 +267,8 @@ class ProjectController extends AppBaseController
         }
 
         // delete folder project
-        $urlProject = self::PROJECTS_IMAGES.$project->id.'-'.$project->title;
+        $id= sprintf("%04d",$project->id);
+        $urlProject = self::PROJECTS_IMAGES.$id.'-'.$project->title;
         File::deleteDirectory(base_path().$urlProject, $preserve = false);
 
         $this->projectRepository->delete($id);

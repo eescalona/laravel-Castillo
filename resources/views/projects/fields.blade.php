@@ -1,8 +1,23 @@
-<!-- Title Field -->
-<div class="form-group col-sm-6">
-    {!! Form::label('title', 'Title:') !!}
-    {!! Form::text('title', null, ['class' => 'form-control']) !!}
-</div>
+@if(isset($project))
+
+    <!-- Title Field -->
+    <div class="form-group col-sm-5">
+        {!! Form::label('title', 'Title:') !!}<br>
+        {!! $project->title !!}
+    </div>
+
+    <!-- Id Field -->
+    <div class="form-group col-sm-1">
+        {!! Form::label('id', 'Id:') !!}
+        {!! $project->id !!}
+    </div>
+@else
+    <!-- Title Field -->
+    <div class="form-group col-sm-6">
+        {!! Form::label('title', 'Title:') !!}
+        {!! Form::text('title', null, ['class' => 'form-control']) !!}
+    </div>
+@endif
 
 <!-- Year Field -->
 <div class="form-group col-sm-6">
