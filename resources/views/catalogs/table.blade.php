@@ -3,7 +3,7 @@
     <thead>
         <th>Title</th>
         <th>Imagen</th>
-        <th>Url</th>
+        <th class="hidden-xs">Url</th>
         <th colspan="3">Action</th>
     </thead>
     <tbody>
@@ -11,7 +11,7 @@
         <tr>
             <td>{!! $catalog->title !!}</td>
             <td>{!! Html::image($catalog->image->url,'alt', array( 'width' => 70, 'height' => 70 )) !!}</td>
-            <td>{!! $catalog->url !!}</td>
+            <td class="hidden-xs">{!! $catalog->url !!}</td>
             <td>
                 {!! Form::open(['route' => ['catalogs.destroy', $catalog->id], 'method' => 'delete']) !!}
                 <div class='btn-group'>

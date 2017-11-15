@@ -3,10 +3,10 @@
     <thead>
         <tr>
             <th>Id</th>
-        <th>Title</th>
-        <th>Image</th>
-        <th>Pdf</th>
-            <th colspan="3">Action</th>
+            <th>Title</th>
+            <th>Image</th>
+            <th class="hidden-xs">Pdf</th>
+            <th colspan="2">Action</th>
         </tr>
     </thead>
     <tbody>
@@ -15,7 +15,7 @@
             <td>{!! $promotion->id !!}</td>
             <td>{!! $promotion->title !!}</td>
             <td>{!! Html::image($promotion->image->url,'alt', array( 'width' => 70, 'height' => 70 )) !!}</td>
-            <td>{!! $promotion->pdf !!}</td>
+            <td class="hidden-xs">{!! $promotion->pdf !!}</td>
             <td>
                 {!! Form::open(['route' => ['promotions.destroy', $promotion->id], 'method' => 'delete']) !!}
                 <div class='btn-group'>

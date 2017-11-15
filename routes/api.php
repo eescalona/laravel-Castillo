@@ -20,6 +20,11 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 Route::get('projects/{project_id}/', 'ProjectAPIController@show');
 Route::get('projects/{project_id}/gallery', 'ProjectAPIController@gallery');
 Route::get('/projects/categories/{category_slug}')->uses('ProjectAPIController@index');
+Route::get('projects/favorites/{items}/', 'ProjectAPIController@favorites');
+Route::get('projects/favorite/{project_id}/{items}/', 'ProjectAPIController@showFavorite');
 
 Route::resource('catalogs', 'CatalogAPIController');
 Route::resource('promotions', 'PromotionsAPIController');
+Route::resource('blogs', 'BlogAPIController');
+
+Route::post('mail')->uses('MailAPIController@send');

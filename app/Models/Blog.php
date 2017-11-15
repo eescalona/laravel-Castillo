@@ -5,24 +5,29 @@ namespace App\Models;
 use Eloquent as Model;
 
 /**
- * Class Catalog
+ * Class Blog
  * @package App\Models
- * @version September 16, 2017, 4:32 pm UTC
+ * @version November 9, 2017, 9:36 pm UTC
  *
  * @property string title
- * @property integer image
+ * @property string description
+ * @property string tags
+ * @property integer image_id
  * @property string url
  */
-class Catalog extends Model
+class Blog extends Model
 {
-    public $table = 'catalogs';
+    public $table = 'blogs';
     
     const CREATED_AT = 'created_at';
     const UPDATED_AT = 'updated_at';
 
 
+
     public $fillable = [
         'title',
+        'description',
+        'tags',
         'image_id',
         'url'
     ];
@@ -35,6 +40,8 @@ class Catalog extends Model
     protected $casts = [
         'id' => 'integer',
         'title' => 'string',
+        'description' => 'string',
+        'tags' => 'string',
         'image_id' => 'integer',
         'url' => 'string'
     ];
@@ -45,7 +52,9 @@ class Catalog extends Model
      * @var array
      */
     public static $rules = [
+
         'title' => 'required',
+        'description' => 'required',
         'url' => 'required',
         'image' => 'required',
     ];
@@ -57,5 +66,4 @@ class Catalog extends Model
     {
         return $this->hasOne(\App\Models\MyFile::class,'id','image_id');
     }
-    
 }

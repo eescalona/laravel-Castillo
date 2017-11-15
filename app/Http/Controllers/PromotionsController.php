@@ -37,7 +37,7 @@ class PromotionsController extends AppBaseController
     public function index(Request $request)
     {
         $this->promotionsRepository->pushCriteria(new RequestCriteria($request));
-        $promotions = $this->promotionsRepository->paginate(25);
+        $promotions = $this->promotionsRepository->orderBy('id', 'DESC')->paginate(25);
 
         return view('promotions.index')
             ->with('promotions', $promotions);
@@ -70,12 +70,12 @@ class PromotionsController extends AppBaseController
         $url = self::PROMOTIONS_IMAGES.$promotion_path;
 
         if($request->hasFile('filePdf')) {
+
             $file = $request->file('filePdf');
             $name = pathinfo( $file->getClientOriginalName(), PATHINFO_FILENAME);
             $extension = pathinfo( $file->getClientOriginalName(), PATHINFO_EXTENSION);
             $slug = SlugService::createSlug(MyFile::class, 'slug', $name);
             $slug = $slug.'.'.$extension;
-
             // create folder Promotions
             File::makeDirectory(base_path().$url, $mode = 0755, $recursive = true, $force = false);
 

@@ -37,7 +37,7 @@ class PromotionsAPIController extends AppBaseController
         $this->promotionsRepository->pushCriteria(new RequestCriteria($request));
         $this->promotionsRepository->pushCriteria(new LimitOffsetCriteria($request));
 
-        $promotions = $this->promotionsRepository->all();
+        $promotions = $this->promotionsRepository->orderBy('id', 'DESC')->all();
 
         $promotions->transform(function ($promotion, $key) {
             if(isset($promotion->image)){

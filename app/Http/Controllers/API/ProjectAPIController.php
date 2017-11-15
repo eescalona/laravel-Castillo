@@ -47,30 +47,30 @@ class ProjectAPIController extends AppBaseController
                 return $this->sendResponse(NULL, 'Category not found');
             }
             $projects = Project::whereCategoryId($category->id)->orderBy('id', 'DESC')->get();
-
-            $projects->transform(function ($project, $key) {
-                if(isset($project->image)){
-                    $project->image_url = $project->image->url;
-                }else{
-                    $project->image_url = '';
-                }
-                $list=Project::whereCategoryId($project->category_id)->orderBy('id', 'DESC')->get();
-                $maxItem=$list->count()-2;
-                if($key>$maxItem){
-                    $project->next_id = 0;
-                }else{
-                    $project->next_id = $list[$key+1]->id;
-                }
-
-                if($key==0){
-                    $project->prev_id = 0;
-                }else{
-                    $project->prev_id = $list[$key-1]->id;
-                }
-
-                return $project;
-            });
         }
+
+        $projects->transform(function ($project, $key) {
+            if(isset($project->image)){
+                $project->image_url = $project->image->url;
+            }else{
+                $project->image_url = '';
+            }
+            $list=Project::whereCategoryId($project->category_id)->orderBy('id', 'DESC')->get();
+            $maxItem=$list->count()-2;
+            if($key>$maxItem){
+                $project->next_id = 0;
+            }else{
+                $project->next_id = $list[$key+1]->id;
+            }
+
+            if($key==0){
+                $project->prev_id = 0;
+            }else{
+                $project->prev_id = $list[$key-1]->id;
+            }
+
+            return $project;
+        });
 
         return $this->sendResponse($projects->toArray(), 'Projects retrieved successfully');
     }
@@ -117,6 +117,91 @@ class ProjectAPIController extends AppBaseController
 
         // get next and previous item on the list
         $list=Project::whereCategoryId($project->category_id)->orderBy('id', 'DESC')->get();
+        $listFilter=$list->filter(function($collection) use ($project, &$project_pos) {
+            if ($collection->id === $project->id) {
+                return true;
+            }
+            return false;
+        });
+
+        $keys = $listFilter->keys();
+        $project_pos =$keys->first();
+        $maxItem = $list->count()-1;
+
+        if ($project_pos == $maxItem) {
+            $project->next_id = 0;
+        } else {
+            $project->next_id = $list[$project_pos+1]->id;
+        }
+
+        if ($project_pos == 0) {
+            $project->prev_id = 0;
+        } else {
+            $project->prev_id = $list[$project_pos-1]->id;
+        }
+
+        return $this->sendResponse($project->toArray(), 'Project retrieved successfully');
+    }
+
+    public function favorites(Request $request, $items){
+        $this->projectRepository->pushCriteria(new RequestCriteria($request));
+        $this->projectRepository->pushCriteria(new LimitOffsetCriteria($request));
+
+
+        if($items == NULL){
+            $projects = $this->projectRepository->All();
+        } else{
+            $ids = explode(',', $items);
+            $projects = Project::whereIn('id',$ids)->orderBy('id', 'DESC')->get();
+        }
+
+        $projects->transform(function ($project, $key) use($items){
+        if(isset($project->image)){
+            $project->image_url = $project->image->url;
+        }else{
+            $project->image_url = '';
+        }
+        $ids = explode(',', $items);
+        $list = Project::whereIn('id',$ids)->orderBy('id', 'DESC')->get();
+
+        $maxItem=$list->count()-2;
+        if($key>$maxItem){
+            $project->next_id = 0;
+        }else{
+            $project->next_id = $list[$key+1]->id;
+        }
+
+        if($key==0){
+            $project->prev_id = 0;
+        }else{
+            $project->prev_id = $list[$key-1]->id;
+        }
+
+        return $project;
+        });
+
+        return $this->sendResponse($projects->toArray(), 'Projects retrieved successfully');
+    }
+
+    public function showFavorite($id, $items)
+    {
+        /** @var Project $project */
+        $project = $this->projectRepository->findWithoutFail($id);
+
+        if (empty($project)) {
+            return $this->sendError('Project not found');
+        }else{
+            if(isset($project->image)){
+                $project->image_url = $project->image->url;
+            }else{
+                $project->image_url = '';
+            }
+        }
+
+        // get next and previous item on the list
+        $ids = explode(',', $items);
+        $list = Project::whereIn('id',$ids)->orderBy('id', 'DESC')->get();
+
         $listFilter=$list->filter(function($collection) use ($project, &$project_pos) {
             if ($collection->id === $project->id) {
                 return true;

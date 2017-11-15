@@ -3,12 +3,12 @@
         <th>Id</th>
         <th>Title</th>
         <th>Imagen principal</th>
-        <th>Year</th>
-        <th>Category</th>
-        <th>Style</th>
-        <th>Price</th>
-        <th>Description</th>
-        <th>Address</th>
+        <th class="hidden-xs">Year</th>
+        <th class="hidden-xs">Category</th>
+        <th class="hidden-xs">Style</th>
+        <th class="hidden-xs">Price</th>
+        <th class="hidden-xs">Description</th>
+        <th class="hidden-xs">Address</th>
         <th colspan="3">Action</th>
     </thead>
     <tbody>
@@ -17,12 +17,12 @@
             <td>{!! $project->id !!}</td>
             <td>{!! $project->title !!}</td>
             <td>{!! Html::image($project->image->url,$project->slug, array( 'width' => 70, 'height' => 70 )) !!}</td>
-            <td>{!! $project->year !!}</td>
-            <td>{!! $project->category->title !!}</td>
-            <td>{!! $project->style !!}</td>
-            <td>{!! $project->price !!}</td>
-            <td>{!! $project->description !!}</td>
-            <td>{!! $project->address !!}</td>
+            <td class="hidden-xs">{!! $project->year !!}</td>
+            <td class="hidden-xs">{!! $project->category->title !!}</td>
+            <td class="hidden-xs">{!! $project->style !!}</td>
+            <td class="hidden-xs">{!! $project->price !!}</td>
+            <td class="hidden-xs">{!! $project->description !!}</td>
+            <td class="hidden-xs">{!! $project->address !!}</td>
             <td>
 
 
