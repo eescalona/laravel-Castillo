@@ -1,7 +1,6 @@
 <?php
 namespace App\Models;
 use Eloquent as Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Cviebrock\EloquentSluggable\Sluggable;
 /**
  * Class MyFile
@@ -65,7 +64,15 @@ class MyFile extends Model
      **/
     public function project()
     {
-        return $this->belongsTo(\App\Models\Project::class);
+        return $this->belongsTo(Project::class);
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     **/
+    public function options()
+    {
+        return $this->hasMany(Options::class);
     }
 
 }

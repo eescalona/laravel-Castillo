@@ -19,6 +19,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 Route::get('projects/{project_id}/', 'ProjectAPIController@show');
 Route::get('projects/{project_id}/gallery', 'ProjectAPIController@gallery');
+Route::get('projects/{project_id}/combination', 'ProjectAPIController@combination');
 Route::get('/projects/categories/{category_slug}')->uses('ProjectAPIController@index');
 Route::get('projects/favorites/{items}/', 'ProjectAPIController@favorites');
 Route::get('projects/favorite/{project_id}/{items}/', 'ProjectAPIController@showFavorite');

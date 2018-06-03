@@ -5,7 +5,11 @@ namespace App\Http\Controllers\API;
 use App\Models\Category;
 use App\Models\MyFile;
 use App\Models\Project;
+use App\Models\Combination;
+use App\Models\Options;
+use App\Models\Files_Options;
 use App\Repositories\ProjectRepository;
+use App\Repositories\CombinationRepository;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
 use InfyOm\Generator\Criteria\LimitOffsetCriteria;
@@ -21,10 +25,12 @@ class ProjectAPIController extends AppBaseController
 {
     /** @var  ProjectRepository */
     private $projectRepository;
+    private $combinationRepository;
 
-    public function __construct(ProjectRepository $projectRepo)
+    public function __construct(ProjectRepository $projectRepo, CombinationRepository $combinationRepo)
     {
         $this->projectRepository = $projectRepo;
+        $this->combinationRepository = $combinationRepo;
     }
 
     /**
@@ -88,7 +94,34 @@ class ProjectAPIController extends AppBaseController
             ->where('id', '<>',$principal_image->id)
             ->get();
         $all_files->prepend($principal_image);
+
+
+        $all_files->filter(function($collection){
+            $collection->options = Files_Options::whereFileId($collection->id)
+                ->get();
+        });
+
         return $this->sendResponse($all_files, 'Gallery retrieved successfully');
+
+    }
+
+    /**
+     * Display a listing of the Project.
+     * GET|HEAD /projects
+     *
+     * @param Request $request
+     * @return Response
+     */
+    public function combination(Request $request, $project_id){
+
+        $list = Combination::whereProjectId($project_id)->get();
+
+        $list->filter(function($collection){
+            $collection->options = Options::whereCombinationId($collection->id)
+                    ->get();
+        });
+
+        return $this->sendResponse($list, 'Combination retrieved successfully');
 
     }
 
